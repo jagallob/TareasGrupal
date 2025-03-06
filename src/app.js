@@ -48,32 +48,49 @@ function gestionTarea(e) {
 }
 
 function editarTarea(li) {
-  // Obtener el texto actual de la tarea (eliminamos los botones y espacios)
-  const textoActual = li.textContent.replace("x", "").replace("Editar", "").trim();
-  
-  // Colocar el texto de la tarea en el campo de entrada
-  input.value = textoActual;
+  const textoActual = li.textContent
+    .replace("x", "")
+    .replace("Editar", "")
+    .trim();
 
-  // Cambiar el botón de "Editar" a "Guardar"
-  const botonGuardar = document.createElement("button");
-  botonGuardar.textContent = "Guardar";
-  botonGuardar.classList.add("guardar");
+  const inputEdit = document.createElement("input");
+  inputEdit.type = "text";
+  inputEdit.value = textoActual;
 
-  // Reemplazar el botón de "Editar" por el de "Guardar"
-  const botonEditar = li.querySelector(".editar");
-  li.replaceChild(botonGuardar, botonEditar);
+  li.textContent = "";
+  li.appendChild(inputEdit);
 
-  // Añadir el evento para guardar la tarea editada
-  botonGuardar.addEventListener("click", function() {
-    const nuevaTarea = input.value.trim();
-    if (nuevaTarea === "") {
-      return alert("Debes escribir una tarea");
+  inputEdit.focus();
+
+  function guardarCambios() {
+    const nuevoTexto = inputEdit.value.trim();
+    if (nuevoTexto === "") {
+      li.remove();
+    } else {
+      li.textContent = nuevoTexto;
+
+      const botonEditar = document.createElement("button");
+      botonEditar.textContent = "Editar";
+      botonEditar.classList.add("editar");
+
+      const botonBorrar = document.createElement("button");
+      botonBorrar.textContent = "x";
+      botonBorrar.classList.add("borrar");
+
+      li.appendChild(botonBorrar);
+      li.appendChild(botonEditar);
     }
 
-    li.firstChild.textContent = nuevaTarea; // Actualizar el texto de la tarea
-    li.replaceChild(botonEditar, botonGuardar);
     guardarTareasEnLocalStorage();
+  }
+
+  inputEdit.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      guardarCambios();
+    }
   });
+
+  inputEdit.addEventListener("blur", guardarCambios);
 }
 
 function cargarTareas() {
